@@ -1,0 +1,30 @@
+# Ignore compiled Python files
+*.pyc
+
+# Ignore the virtual environment directory
+venv/
+
+# Ignore the Django migration files
+**/migrations/*.py
+**/migrations/*.pyc
+
+# Ignore the static files directory (if you're using a different directory, adjust accordingly)
+staticfiles/
+
+# Ignore the media files directory (if you're using a different directory, adjust accordingly)
+media/
+
+# Ignore the secret key settings file
+*.secret_key
+
+# Ignore any local settings files
+local_settings.py
+
+# Ignore the database file (if you're using SQLite)
+*.db
+
+# Ignore the log files
+*.log
+
+# Ignore any files or directories you don't want to include in the repository
+# For example, sensitive configuration files or local development files
