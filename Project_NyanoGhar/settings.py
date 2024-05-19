@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "user_auth_app.apps.UserAuthAppConfig",
     "property_app.apps.PropertyAppConfig",
     "rest_framework" ,
-    
+    "rest_framework.authtoken"
 ]
 
 MIDDLEWARE = [

@@ -20,6 +20,7 @@ class Property(models.Model):
     def __str__(self):
         return self.title
 
+
 class Image(models.Model):
     image_id = models.IntegerField(primary_key=True)
     property_id = models.ForeignKey(Property, on_delete=models.CASCADE)
