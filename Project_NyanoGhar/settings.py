@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     "user_auth_app.apps.UserAuthAppConfig",
     "property_app.apps.PropertyAppConfig",
     "rest_framework" ,
-    "rest_framework.authtoken"
+    "rest_framework.authtoken",
+    "rest_framework_simplejwt"
 ]
 
 MIDDLEWARE = [
@@ -131,3 +132,10 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}

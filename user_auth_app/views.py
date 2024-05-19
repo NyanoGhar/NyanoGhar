@@ -1,15 +1,29 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-
 from django.http import JsonResponse
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import login as auth_login, logout as auth_logout
-from django.views.decorators.csrf import csrf_exempt
+
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
+from .serializers import UserSerializer
 
 
 @api_view(['POST'])
 def signup(request):
-    return Response({})
+    serializer = UserSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        user = User.objects.get(username=request.data['username'])
+        user.set_password(request.data['password'])
+        user.save()
+        token = Token.objects.create(user=user)
+        return Response({'token': token.key, 'user': serializer.data})
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['POST'])
@@ -17,6 +31,6 @@ def login(request):
     return Response({})
 
 
-@api_view(['POST'])
-def testapi(request):
+@api_view(['GET'])
+def test_token(request):
     return Response({})
