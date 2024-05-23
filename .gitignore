@@ -33,3 +33,4 @@ __pycache__/
 # Ignore any files or directories you don't want to include in the repository
 # For example, sensitive configuration files or local development files
 .env
+db.sqlite3
