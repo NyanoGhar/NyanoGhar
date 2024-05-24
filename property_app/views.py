@@ -35,32 +35,28 @@ class PropertyCreateAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#was working here - need to fix multiple image upload at a time
 
 class ImageViewSet(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request):
         # Check if property id in request belongs to the authenticated user
-        data = dict(request.data)
-        print(data)
-        property_id=data.get('property')
-        # print(data,property_id)
+        property_id = request.data.get('property')
         if not Property.objects.filter(owner=request.user, property_id=property_id).exists():
-            return Response({'error': 'Property not found or does not be long to the user'}, status=status.HTTP_403_FORBIDDEN)
+            return Response({'error': 'Property not found or does not belong to the user'}, status=status.HTTP_403_FORBIDDEN)
 
-        if 'images' in request.FILES:
-            images = request.FILES.getlist('images')
+        images_data = request.data.get('images')
+        if images_data:
             image_data = []
-            for image in images:
-                data = {'property': property_id, 'image': image}
-                serializer = ImageSerializer(data=data)
-                if serializer.is_valid():
-                    serializer.save()
-                    image_data.append(serializer.data)
-                else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            for img_data in images_data:
+                try:
+                    # Save base64 image to the Image model
+                    image_instance = Image(property_id=property_id)
+                    image_instance.save_base64_image(img_data)
+                    image_instance.save()
+                    image_data.append({'image_id': image_instance.image_id})
+                except Exception as e:
+                    return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
             return Response(image_data, status=status.HTTP_201_CREATED)
         else:
             return Response({'error': 'No images found in request'}, status=status.HTTP_400_BAD_REQUEST)

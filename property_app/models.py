@@ -51,22 +51,26 @@ class Image(models.Model):
     image = models.TextField()  # Changed from CharField to TextField
 
     def save_base64_image(self, base64_string, quality=60):
-        # Decode base64 string
-        img_data = base64.b64decode(base64_string)
-        
-        # Open image using PIL
-        img = PILImage.open(io.BytesIO(img_data))
-        
-        # Compress image
-        img = img.convert("RGB")  # Ensure the image is in RGB mode for compression
-        img_io = io.BytesIO()
-        img.save(img_io, format='JPEG', quality=quality)
-        
-        # Encode compressed image as base64
-        compressed_base64_string = base64.b64encode(img_io.getvalue()).decode('utf-8')
-        
-        # Save compressed base64 image
-        self.image = compressed_base64_string
+        try:
+            # Decode base64 string
+            img_data = base64.b64decode(base64_string)
+            
+            # Open image using PIL
+            img = PILImage.open(io.BytesIO(img_data))
+            
+            # Compress image
+            img = img.convert("RGB")  # Ensure the image is in RGB mode for compression
+            img_io = io.BytesIO()
+            img.save(img_io, format='JPEG', quality=quality)
+            
+            # Encode compressed image as base64
+            compressed_base64_string = base64.b64encode(img_io.getvalue()).decode('utf-8')
+            
+            # Save compressed base64 image
+            self.image = compressed_base64_string
+        except Exception as e:
+            # Handle exceptions such as invalid base64 strings or image processing errors
+            raise ValueError("Failed to process image: {}".format(str(e)))
 
     def get_base64_image(self):
         return self.url
