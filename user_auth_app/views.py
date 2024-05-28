@@ -49,7 +49,12 @@ class UserProfileUpdateAPIView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         # Return the UserProfile of the currently authenticated user
-        return self.request.user.userprofile
+        user = self.request.user
+        try:
+            return user.user_profile
+        except UserProfile.DoesNotExist:
+            # Create a new UserProfile object for the user
+            return UserProfile.objects.create(user=user)
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -60,7 +65,15 @@ class UserProfileUpdateAPIView(generics.RetrieveUpdateAPIView):
         return Response(serializer.data)
 
     def perform_update(self, serializer):
+        # Perform additional actions before saving the serializer
+        # For example, you might want to add custom logic or validation here
+        # This is where you can extend the functionality based on your requirements
+        
+        # Call the save method of the serializer
         serializer.save()
+
+        # You can also return a custom response if needed
+        return Response({'message': 'Profile updated successfully'}, status=status.HTTP_200_OK)
             
 class Health(APIView):
     permission_classes = [IsAuthenticated]

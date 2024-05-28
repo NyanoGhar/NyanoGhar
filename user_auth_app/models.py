@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.models import Group, Permission
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+
+
 
 class UserManager(BaseUserManager):
     def create_user(self, username, email, password=None, is_owner=False):
@@ -48,9 +52,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name="user_profile")
     biography = models.TextField(blank=True)
     contact_information = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return self.user.username
+    
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
