@@ -62,3 +62,16 @@ class ImageViewSet(APIView):
             return Response({'error': 'No images found in request'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class OwnerPropertyListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        properties = Property.objects.filter(owner=request.user)
+        serialized_properties = []
+        for prop in properties:
+            prop_data = PropertySerializer(prop).data
+            images = prop.images.all() 
+            image_data = ImageSerializer(images, many=True).data
+            prop_data['images'] = image_data
+            serialized_properties.append(prop_data)
+        return Response(serialized_properties, status=status.HTTP_200_OK)
